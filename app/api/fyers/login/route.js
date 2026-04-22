@@ -5,10 +5,15 @@ export async function GET() {
     "https://greeknova-backend.vercel.app/api/fyers/callback";
 
   const url =
-    `https://api.fyers.in/api/v3/generate-authcode?client_id=${clientId}` +
+    `https://api-t1.fyers.in/api/v3/generate-authcode?client_id=${clientId}` +
     `&redirect_uri=${encodeURIComponent(redirectUri)}` +
     `&response_type=code` +
     `&state=greeknova`;
 
-  return Response.redirect(url);
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: url,
+    },
+  });
 }
