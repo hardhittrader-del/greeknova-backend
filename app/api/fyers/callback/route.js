@@ -5,39 +5,32 @@ export async function GET(req) {
     const auth_code = searchParams.get("auth_code");
 
     if (!auth_code) {
-      return Response.json({
-        success: false,
-        error: "No auth_code received",
-      });
+      return Response.json({ error: "Missing auth_code" });
     }
 
-    const response = await fetch(
-      "https://api.fyers.in/api/v3/token",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          grant_type: "authorization_code",
-          appId: "358T0EI1TC", // ✅ WITHOUT -100 (CRITICAL FIX)
-          code: auth_code,
-          redirect_uri:
-            "https://greeknovabeta.vercel.app/api/fyers/callback",
-        }),
-      }
-    );
+    const response = await fetch("https://api.fyers.in/api/v3/validate-authcode", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        grant_type: "authorization_code",
+        appIdHash: process.env.FYERS_APP_ID + ":" + process.env.FYERS_SECRET,
+        code: auth_code
+      })
+    });
 
     const data = await response.json();
 
     return Response.json({
       success: true,
-      fyers: data,
+      data
     });
+
   } catch (err) {
     return Response.json({
       success: false,
-      error: err.message,
+      error: err.message
     });
   }
 }
