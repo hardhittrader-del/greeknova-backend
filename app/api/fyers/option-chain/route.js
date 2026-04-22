@@ -2,21 +2,31 @@ export async function GET() {
   try {
     const access_token = process.env.FYERS_ACCESS_TOKEN;
 
-    const symbol = "NSE:NIFTY50-INDEX";
+    if (!access_token) {
+      return Response.json({
+        success: false,
+        error: "Missing FYERS_ACCESS_TOKEN",
+      });
+    }
 
     const response = await fetch(
-      `https://api.fyers.in/data-rest/v2/options-chain?symbol=${symbol}`,
+      "https://api-t1.fyers.in/data/option-chain",
       {
-        method: "GET",
+        method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${access_token}`,
         },
+        body: JSON.stringify({
+          symbol: "NSE:NIFTY50-INDEX",
+          strikecount: 20,
+          timestamp: "",
+        }),
       }
     );
 
     const raw = await response.json();
 
-    // 🔴 RETURN FULL RAW DATA (IMPORTANT)
     return Response.json({
       success: true,
       raw,
