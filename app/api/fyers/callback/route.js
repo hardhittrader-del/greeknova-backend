@@ -13,15 +13,15 @@ export async function GET(req) {
       });
     }
 
-    // 🔐 Create App ID Hash (CRITICAL)
+    // 🔐 Generate App ID Hash
     const appIdHash = crypto
       .createHash("sha256")
       .update(`${process.env.FYERS_APP_ID}:${process.env.FYERS_SECRET}`)
       .digest("hex");
 
-    // 🔁 Exchange auth_code → access_token
+    // 🔁 IMPORTANT: Use api-t1 (NOT api.fyers.in)
     const response = await fetch(
-      "https://api.fyers.in/api/v3/validate-authcode",
+      "https://api-t1.fyers.in/api/v3/validate-authcode",
       {
         method: "POST",
         headers: {
@@ -37,7 +37,6 @@ export async function GET(req) {
 
     const data = await response.json();
 
-    // 🔍 Return FYERS response
     return Response.json({
       success: true,
       fyers_response: data,
