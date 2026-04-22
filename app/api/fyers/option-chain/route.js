@@ -1,37 +1,43 @@
 export async function GET() {
   try {
     const token = process.env.FYERS_ACCESS_TOKEN;
+    const appId = "358T0EI1TC-100";
 
     if (!token) {
       return Response.json({
         success: false,
-        error: "Missing FYERS_ACCESS_TOKEN",
+        error: "Missing token",
       });
     }
 
-    const appId = "358T0EI1TC-100";
+    const url = "https://api.fyers.in/data/quotes?symbols=NSE:NIFTY50-INDEX";
 
-    const response = await fetch(
-      "https://api.fyers.in/api/v3/quotes?symbols=NSE:NIFTY50-INDEX",
-      {
-        method: "GET",
-        headers: {
-          Authorization: `${appId}:${token}`, // 🔥 FINAL FIX
-        },
-      }
-    );
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `${appId}:${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
-    const data = await response.json();
+    const raw = await response.text();
+
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      data = raw;
+    }
 
     return Response.json({
       success: true,
       data,
     });
 
-  } catch (error) {
+  } catch (err) {
     return Response.json({
       success: false,
-      error: error.message,
+      error: err.message,
     });
   }
 }
