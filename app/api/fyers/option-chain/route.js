@@ -5,17 +5,17 @@ export async function GET() {
     if (!token) {
       return Response.json({
         success: false,
-        error: "Missing token",
+        error: "Missing FYERS_ACCESS_TOKEN",
       });
     }
 
-    // ✅ USE V2 QUOTES (STABLE + WORKS)
+    // ✅ SIMPLE TEST CALL (NO COMPLEXITY)
     const res = await fetch(
-      "https://api.fyers.in/data-rest/v2/quotes?symbols=NSE:NIFTY50-INDEX",
+      "https://api.fyers.in/api/v3/quotes?symbols=NSE:NIFTY50-INDEX",
       {
         method: "GET",
         headers: {
-          Authorization: token, // ⚠️ NO Bearer
+          Authorization: `Bearer ${token}`,
         },
       }
     );
