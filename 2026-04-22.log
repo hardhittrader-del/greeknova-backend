@@ -1,0 +1,2 @@
+{"level":"debug","datetime":"2026-04-22T09:58:16.469Z","message":"generate authcode response","data":"https://api.fyers.in/api/v2generate-authcode?client_id=358T0EI1TC-100&redirect_uri=null&response_type=code&state=sample_state","functionName":"generateAuthCode"}
+{"level":"debug","datetime":"2026-04-22T10:01:20.305Z","message":"generate authcode response","data":"https://api.fyers.in/api/v2generate-authcode?client_id=358T0EI1TC-100&redirect_uri=https://greeknovabeta.vercel.app/api/fyers/callback&response_type=code&state=sample_state","functionName":"generateAuthCode"}
