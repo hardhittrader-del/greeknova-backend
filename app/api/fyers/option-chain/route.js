@@ -9,13 +9,18 @@ export async function GET() {
       });
     }
 
-    // 🔥 FIXED ENDPOINT + HEADER
+    // 🔥 STEP 1 — GET SPOT PRICE (POST METHOD)
     const spotRes = await fetch(
-      "https://api.fyers.in/api/v3/quotes?symbols=NSE:NIFTY50-INDEX",
+      "https://api.fyers.in/api/v3/quotes",
       {
+        method: "POST",
         headers: {
-          Authorization: access_token, // ✅ NOT Bearer
+          "Content-Type": "application/json",
+          Authorization: access_token,
         },
+        body: JSON.stringify({
+          symbols: "NSE:NIFTY50-INDEX",
+        }),
       }
     );
 
@@ -30,6 +35,7 @@ export async function GET() {
       });
     }
 
+    // 🔥 STEP 2 — CREATE STRIKES AROUND ATM
     const base = Math.round(spot / 50) * 50;
 
     const strikes = [];
@@ -37,7 +43,8 @@ export async function GET() {
       strikes.push(base + i * 50);
     }
 
-    const expiry = "25APR"; // keep static for now
+    // ⚠️ TEMP expiry (we will automate later)
+    const expiry = "25APR";
 
     const symbols = [];
 
@@ -46,12 +53,18 @@ export async function GET() {
       symbols.push(`NSE:NIFTY${expiry}${strike}PE`);
     });
 
+    // 🔥 STEP 3 — FETCH OPTION DATA (POST METHOD)
     const quotesRes = await fetch(
-      `https://api.fyers.in/api/v3/quotes?symbols=${symbols.join(",")}`,
+      "https://api.fyers.in/api/v3/quotes",
       {
+        method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: access_token,
         },
+        body: JSON.stringify({
+          symbols: symbols.join(","),
+        }),
       }
     );
 
