@@ -9,12 +9,12 @@ export async function GET() {
       });
     }
 
-    // 🔥 Step 1: Fetch NIFTY spot
+    // 🔥 FIXED ENDPOINT + HEADER
     const spotRes = await fetch(
-      "https://api.fyers.in/data-rest/v2/quotes?symbols=NSE:NIFTY50-INDEX",
+      "https://api.fyers.in/api/v3/quotes?symbols=NSE:NIFTY50-INDEX",
       {
         headers: {
-          Authorization: `Bearer ${access_token}`,
+          Authorization: access_token, // ✅ NOT Bearer
         },
       }
     );
@@ -30,7 +30,6 @@ export async function GET() {
       });
     }
 
-    // 🔥 Step 2: Generate strikes around ATM
     const base = Math.round(spot / 50) * 50;
 
     const strikes = [];
@@ -38,8 +37,7 @@ export async function GET() {
       strikes.push(base + i * 50);
     }
 
-    // 🔥 Step 3: Build option symbols (weekly expiry example)
-    const expiry = "25APR"; // ⚠️ update dynamically later
+    const expiry = "25APR"; // keep static for now
 
     const symbols = [];
 
@@ -48,12 +46,11 @@ export async function GET() {
       symbols.push(`NSE:NIFTY${expiry}${strike}PE`);
     });
 
-    // 🔥 Step 4: Fetch quotes
     const quotesRes = await fetch(
-      `https://api.fyers.in/data-rest/v2/quotes?symbols=${symbols.join(",")}`,
+      `https://api.fyers.in/api/v3/quotes?symbols=${symbols.join(",")}`,
       {
         headers: {
-          Authorization: `Bearer ${access_token}`,
+          Authorization: access_token,
         },
       }
     );
