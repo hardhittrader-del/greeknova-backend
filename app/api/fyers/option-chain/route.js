@@ -9,28 +9,26 @@ export async function GET() {
       });
     }
 
-    // ✅ SIMPLE TEST CALL (NO COMPLEXITY)
-    const res = await fetch(
-      "https://api.fyers.in/api/v3/quotes?symbols=NSE:NIFTY50-INDEX",
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const url = "https://api.fyers.in/api/v3/quotes?symbols=NSE:NIFTY50-INDEX";
 
-    const data = await res.json();
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
 
     return Response.json({
       success: true,
-      data,
+      data: data,
     });
 
-  } catch (err) {
+  } catch (error) {
     return Response.json({
       success: false,
-      error: err.message,
+      error: error.message,
     });
   }
 }
