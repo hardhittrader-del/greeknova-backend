@@ -9,27 +9,62 @@ export async function GET() {
       });
     }
 
-    const response = await fetch(
-      "https://api-t1.fyers.in/data/option-chain",
+    // 🔥 Step 1: Fetch NIFTY spot
+    const spotRes = await fetch(
+      "https://api.fyers.in/data-rest/v2/quotes?symbols=NSE:NIFTY50-INDEX",
       {
-        method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${access_token}`,
         },
-        body: JSON.stringify({
-          symbol: "NSE:NIFTY50-INDEX",
-          strikecount: 20,
-          timestamp: "",
-        }),
       }
     );
 
-    const raw = await response.json();
+    const spotData = await spotRes.json();
+    const spot = spotData?.d?.[0]?.v?.lp;
+
+    if (!spot) {
+      return Response.json({
+        success: false,
+        error: "Failed to fetch spot price",
+        spotData,
+      });
+    }
+
+    // 🔥 Step 2: Generate strikes around ATM
+    const base = Math.round(spot / 50) * 50;
+
+    const strikes = [];
+    for (let i = -5; i <= 5; i++) {
+      strikes.push(base + i * 50);
+    }
+
+    // 🔥 Step 3: Build option symbols (weekly expiry example)
+    const expiry = "25APR"; // ⚠️ update dynamically later
+
+    const symbols = [];
+
+    strikes.forEach((strike) => {
+      symbols.push(`NSE:NIFTY${expiry}${strike}CE`);
+      symbols.push(`NSE:NIFTY${expiry}${strike}PE`);
+    });
+
+    // 🔥 Step 4: Fetch quotes
+    const quotesRes = await fetch(
+      `https://api.fyers.in/data-rest/v2/quotes?symbols=${symbols.join(",")}`,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+
+    const quotesData = await quotesRes.json();
 
     return Response.json({
       success: true,
-      raw,
+      spot,
+      strikes,
+      raw: quotesData,
     });
 
   } catch (err) {
