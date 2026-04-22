@@ -10,24 +10,16 @@ export async function GET() {
       });
     }
 
-    const url = "https://api.fyers.in/data/quotes?symbols=NSE:NIFTY50-INDEX";
+    const url = "https://api.fyers.in/api/v3/quotes?symbols=NSE:NIFTY50-INDEX";
 
     const response = await fetch(url, {
       method: "GET",
       headers: {
         Authorization: `${appId}:${token}`,
-        "Content-Type": "application/json",
       },
     });
 
-    const raw = await response.text();
-
-    let data;
-    try {
-      data = JSON.parse(raw);
-    } catch {
-      data = raw;
-    }
+    const data = await response.json();
 
     return Response.json({
       success: true,
