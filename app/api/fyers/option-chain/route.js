@@ -1,53 +1,33 @@
-import { getToken } from "@/utils/tokenStore";
-
-export async function GET(req) {
+export async function GET() {
   try {
-    const token = getToken();
+    const access_token = process.env.FYERS_ACCESS_TOKEN;
 
-    if (!token) {
+    if (!access_token) {
       return Response.json({
         success: false,
-        error: "No access token. Login first.",
+        error: "Missing FYERS_ACCESS_TOKEN",
       });
     }
 
-    const { searchParams } = new URL(req.url);
+    const symbol = "NSE:NIFTY50-INDEX";
 
-    // Default: NIFTY
-    const symbol = searchParams.get("symbol") || "NSE:NIFTY50-INDEX";
-
-    // Step 1: Get underlying LTP
-    const quoteRes = await fetch(
-      `https://api.fyers.in/api/v2/quotes?symbols=${symbol}`,
+    const response = await fetch(
+      `https://api.fyers.in/data-rest/v2/options-chain?symbol=${symbol}`,
       {
+        method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${access_token}`,
         },
       }
     );
 
-    const quoteData = await quoteRes.json();
-
-    const ltp = quoteData?.d?.[0]?.v?.lp;
-
-    // Step 2: Get option chain
-    const chainRes = await fetch(
-      `https://api.fyers.in/api/v2/options-chain?symbol=${symbol}&strikecount=10`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    const chainData = await chainRes.json();
+    const data = await response.json();
 
     return Response.json({
       success: true,
-      underlying: symbol,
-      ltp,
-      chain: chainData,
+      data,
     });
+
   } catch (err) {
     return Response.json({
       success: false,
