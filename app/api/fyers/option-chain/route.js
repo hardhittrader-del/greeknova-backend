@@ -21,11 +21,33 @@ export async function GET() {
       }
     );
 
-    const data = await response.json();
+    const raw = await response.json();
+
+    // 🔥 CORE TRANSFORMATION (THIS IS YOUR ENGINE BASE)
+    const chain = raw.data?.optionsChain || [];
+
+    const structured = chain.map((strike) => ({
+      strike: strike.strike_price,
+
+      CE: {
+        ltp: strike.call_option?.ltp,
+        oi: strike.call_option?.oi,
+        volume: strike.call_option?.volume,
+        change_oi: strike.call_option?.change_oi,
+      },
+
+      PE: {
+        ltp: strike.put_option?.ltp,
+        oi: strike.put_option?.oi,
+        volume: strike.put_option?.volume,
+        change_oi: strike.put_option?.change_oi,
+      },
+    }));
 
     return Response.json({
       success: true,
-      data,
+      count: structured.length,
+      data: structured,
     });
 
   } catch (err) {
