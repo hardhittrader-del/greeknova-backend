@@ -5,33 +5,33 @@ export async function GET() {
     if (!token) {
       return Response.json({
         success: false,
-        error: "Missing token",
+        error: "Missing FYERS_ACCESS_TOKEN",
       });
     }
+
+    const appId = "358T0EI1TC-100";
 
     const response = await fetch(
       "https://api.fyers.in/api/v3/quotes?symbols=NSE:NIFTY50-INDEX",
       {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          Authorization: `${appId}:${token}`, // 🔥 FINAL FIX
         },
       }
     );
 
-    const text = await response.text();
+    const data = await response.json();
 
-    // 🔴 IMPORTANT: return raw text (not JSON)
     return Response.json({
       success: true,
-      raw_response: text,
+      data,
     });
 
-  } catch (err) {
+  } catch (error) {
     return Response.json({
       success: false,
-      error: err.message,
+      error: error.message,
     });
   }
 }
