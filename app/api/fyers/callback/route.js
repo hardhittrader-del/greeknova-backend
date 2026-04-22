@@ -25,6 +25,8 @@ export async function GET(req) {
           grant_type: "authorization_code",
           appIdHash,
           code: auth_code,
+          redirect_uri:
+            "https://greeknova-backend.vercel.app/api/fyers/callback",
         }),
       }
     );
